@@ -1,0 +1,7 @@
+/.vs
+*/bin/
+*/obj/
+*/Template/
+*/App.config
+*/LinqToDB.Templates/
+/packages/
