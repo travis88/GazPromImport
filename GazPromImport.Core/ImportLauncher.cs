@@ -119,7 +119,9 @@ namespace GazPromImport.Core
                 B_Pribor = item.IsPribor,
                 C_Counter1 = item.Counter1,
                 N_Counter1_Info = GetNullableInteger(counter1Info),
+                C_Counter2 = item.Counter2,
                 N_Counter2_Info = GetNullableInteger(counter2Info),
+                C_Counter3 = item.Counter3,
                 N_Counter3_Info = GetNullableInteger(counter3Info),
                 C_Saldo = item.Saldo
             };

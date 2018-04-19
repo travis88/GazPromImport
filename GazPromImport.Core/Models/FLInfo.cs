@@ -81,10 +81,22 @@ namespace GazPromImport.Core.Models
         public string Counter1Info { get; set; }
 
         /// <summary>
+        /// Счётчик
+        /// </summary>
+        [XmlAttribute("Counter2")]
+        public string Counter2 { get; set; }
+
+        /// <summary>
         /// Инфа по счётчику2
         /// </summary>
         [XmlAttribute("Counter2Info")]
         public string Counter2Info { get; set; }
+
+        /// <summary>
+        /// Счётчик
+        /// </summary>
+        [XmlAttribute("Counter3")]
+        public string Counter3 { get; set; }
 
         /// <summary>
         /// Инфа по счётчику3
