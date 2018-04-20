@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using LinqToDB.Data;
 using System;
 using GazPromImport.Core.Services;
+using System.Text;
 
 namespace GazPromImport.Core
 {
@@ -24,53 +25,61 @@ namespace GazPromImport.Core
         /// <returns></returns>
         public int Start(string path)
         {
-            using (FileStream fileStream = new FileStream(path, FileMode.Open))
+            using (var reader = new StreamReader(path, Encoding.UTF8, true))
             {
                 var serializer = new XmlSerializer(typeof(FLInfoList));
-                var arrayOfInfo = (FLInfoList)serializer.Deserialize(fileStream);
-
-                List<SS_FlInfo> list = new List<SS_FlInfo>();
-                ServiceLogger.Info("{info}", "начало мапинга");
-                foreach (var item in arrayOfInfo.FLInfos)
+                try
                 {
-                    list.Add(CustomMapper(item));
-                }
-                ServiceLogger.Info("{info}", "конец мапинга");
-                using (var db = new dbModel(connection))
-                {
-                    db.CommandTimeout = 1200000;
-                    using (var tr = db.BeginTransaction())
+                    var arrayOfInfo = (FLInfoList)serializer.Deserialize(reader);
+                    
+                    List<SS_FlInfo> list = new List<SS_FlInfo>();
+                    ServiceLogger.Info("{info}", "начало мапинга");
+                    foreach (var item in arrayOfInfo.FLInfos)
                     {
-                        try
+                        list.Add(CustomMapper(item));
+                    }
+                    ServiceLogger.Info("{info}", "конец мапинга");
+                    using (var db = new dbModel(connection))
+                    {
+                        db.CommandTimeout = 1200000;
+                        using (var tr = db.BeginTransaction())
                         {
-                            ServiceLogger.Info("{info}", "таблица SS_FlInfo_Dupl перезапись начало");
-                            db.AbonentInfoDelete();
-                            ServiceLogger.Info("{info}", "таблица SS_FlInfo_Dupl перезапись конец");
-                            ServiceLogger.Info("{info}", "таблица SS_FlInfo очищена");
+                            try
+                            {
+                                ServiceLogger.Info("{info}", "таблица SS_FlInfo_Dupl перезапись начало");
+                                db.AbonentInfoDelete();
+                                ServiceLogger.Info("{info}", "таблица SS_FlInfo_Dupl перезапись конец");
+                                ServiceLogger.Info("{info}", "таблица SS_FlInfo очищена");
 
-                            ServiceLogger.Info("{info}", "таблица SS_FlInfo запись начало");
-                            InsertBulk(list, db);
-                            ServiceLogger.Info("{info}", "таблица SS_FlInfo запись окончание");
+                                ServiceLogger.Info("{info}", "таблица SS_FlInfo запись начало");
+                                InsertBulk(list, db);
+                                ServiceLogger.Info("{info}", "таблица SS_FlInfo запись окончание");
 
-                            ServiceLogger.Info("{info}", "таблица SS_FlInfo обновление начало");
-                            db.AbonentInfoUpdate();
-                            ServiceLogger.Info("{info}", "таблица SS_FlInfo обновление конец");
+                                ServiceLogger.Info("{info}", "таблица SS_FlInfo обновление начало");
+                                db.AbonentInfoUpdate();
+                                ServiceLogger.Info("{info}", "таблица SS_FlInfo обновление конец");
 
-                            tr.Commit();
-                            ServiceLogger.Info("{info}", "импорт завершён");
+                                tr.Commit();
+                                ServiceLogger.Info("{info}", "импорт завершён");
 
-                            return list.Count;
-                        }
-                        catch (Exception e)
-                        {
-                            ServiceLogger.Error("{error}", e.ToString());
-                            return 0;
+                                return list.Count;
+                            }
+                            catch (Exception e)
+                            {
+                                ServiceLogger.Error("{error}", e.ToString());
+                                return 0;
+                            }
                         }
                     }
                 }
+                catch (Exception e)
+                {
+                    ServiceLogger.Error("{error}", e.ToString());
+                    //string sd = @"�";
+                    return 0;
+                }
             }
         }
-
         /// <summary>
         /// Вставляет список записей в таблицу
         /// </summary>
@@ -117,11 +126,11 @@ namespace GazPromImport.Core
                 N_Apartment = GetNullableInteger(apartment),
                 C_Room = item.Room,
                 B_Pribor = item.IsPribor,
-                C_Counter1 = item.Counter1,
+                C_Counter1 = item.Counter1.Replace(@"xFC", "№"),
                 N_Counter1_Info = GetNullableInteger(counter1Info),
-                C_Counter2 = item.Counter2,
+                C_Counter2 = item.Counter2.Replace(@"xFC", "№"),
                 N_Counter2_Info = GetNullableInteger(counter2Info),
-                C_Counter3 = item.Counter3,
+                C_Counter3 = item.Counter3.Replace(@"xFC", "№"),
                 N_Counter3_Info = GetNullableInteger(counter3Info),
                 C_Saldo = item.Saldo
             };

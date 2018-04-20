@@ -8,7 +8,7 @@ namespace GazPromImport.Cmd
         static void Main(string[] args)
         {
             ImportLauncher launcher = new ImportLauncher();
-            launcher.Start(@"");
+            launcher.Start(@"D:\www\gmch.ru\gmch.ru\ImportFiles\last_update\TESTOUTPOSTS.xml");
             Console.ReadLine();
         }
     }

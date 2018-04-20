@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 namespace GazPromImport.Core.Models
@@ -68,11 +69,24 @@ namespace GazPromImport.Core.Models
         [XmlAttribute("Pribor")]
         public bool IsPribor { get; set; }
 
+        //private string _counter1;
+
         /// <summary>
         /// Счётчик
         /// </summary>
         [XmlAttribute("Counter1")]
         public string Counter1 { get; set; }
+        //public string Counter1
+        //{
+        //    get
+        //    {
+        //        return _counter1;
+        //    }
+        //    set
+        //    {
+        //        _counter1 = GetOnlyNumbers(value);
+        //    }
+        //}
 
         /// <summary>
         /// Инфа по счётчику1
@@ -115,5 +129,17 @@ namespace GazPromImport.Core.Models
         /// </summary>
         [XmlAttribute("Saldo")]
         public string Saldo { get; set; }
+
+        /// <summary>
+        /// Заменяет символ № в неправильной кодировке
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private string GetOnlyNumbers(string value)
+        {
+            Regex regex = new Regex(@"\d+");
+            Match match = regex.Match(value);
+            return match.Value;
+        }
     }
 }
